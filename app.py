@@ -8,3 +8,8 @@ app = Flask(__name__, template_folder="static")
 socketio = SocketIO(app)
 processing_started = False
 
+@app.route('/')
+def index():
+    # index.html needs to be created
+    # JSX if time permits
+    return Response(render_template("index.html"))
