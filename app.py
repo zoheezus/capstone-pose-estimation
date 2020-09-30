@@ -13,3 +13,9 @@ def index():
     # index.html needs to be created
     # JSX if time permits
     return Response(render_template("index.html"))
+
+@app.route('/start', methods=['POST'])
+def start():
+    # start processings
+    # delete pass when writing code
+    pass
