@@ -106,3 +106,7 @@ class PoseAppWSockets():
 
         self.received_fps = time.time()
         self.frame_processed_queue.put(frame)
+
+# functions below will use PoseGeom & FrameSocketStream
+# Will need to be created before further progress
+# in this file
