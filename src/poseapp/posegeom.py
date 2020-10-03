@@ -23,3 +23,9 @@ class PoseGeom:
     angle_rads = math.atan2(joint_B.y - joint_A.y, joint_B.x - joint_A.x)
     angle_rads = -angle_rads
     return math.degrees(angle_rads)
+
+  @classmethod
+  def distance_btw_2_points(cls, joint_A, joint_B):
+    a = np.array((joint_A.x, joint_A.y))
+    b = np.array((joint_B.x, joint_B.y))
+    return np.linalg.norm(a - b)
