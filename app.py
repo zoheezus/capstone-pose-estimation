@@ -1,6 +1,7 @@
 import threading
 from queue import Empty
 
+import cv2
 from flask import Flask, render_template, Response, request
 from flask_socketio import SocketIO, send, emit
 
