@@ -1,4 +1,6 @@
+import logging
 import threading
+import traceback
 from queue import Queue
 
 import cv2
@@ -8,10 +10,13 @@ from tf_pose_estimation.tf_pose.networks import get_graph_path, model_wh
 import time
 import tensorflow as tf
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 class PoseAppWSockets():
 
-    def _init_(self, camera=0, resize='0x0', resize_out_ratio=4.0, model="mobilenet_thin", show_process=False,
+    def __init__(self, camera=0, resize='0x0', resize_out_ratio=4.0, model="mobilenet_thin", show_process=False,
                remote_server='', delay_time=500):
 
         self.last_epoch = time.time()
@@ -46,3 +51,25 @@ class PoseAppWSockets():
         self.remote_server = remote_server_ip
 
       self.start_th.start()
+
+    def stop(self):
+      try:
+        if not self.start_th_signal.is_set():
+          self.start_th_signal.set()
+          self.start_th.join()
+
+        # clear the queues
+        with self.frame_processed_queue.mutex:
+          self.frame_processed_queue.queue.clear()
+
+        with self._frame_sent_queue.mutex:
+          self._frame_sent_queue.queue.clear()
+
+        # reset all variables
+        self.sent_fps = time.time()
+        self.received_fps = time.time()
+        return True
+
+      except Exception as e:
+        logger.error(traceback.format_exc())
+        return False
