@@ -116,3 +116,14 @@ class FrameSocketStream():
 
         except Exception as e:
             logger.error("Execption caught: {}".format(traceback.format_exc()))
+
+    def send_message(self, byte_message):
+        try:
+            self.socket.sendall(struct.pack(
+                "<L", len(byte_message)) + byte_message)
+
+        except ZeroDivisionError:
+            print("Exception caught: {}".format(traceback.format_exc()))
+
+        except socket.timeout:
+            logger.info("Socket timeout while sending. Continuing...")
