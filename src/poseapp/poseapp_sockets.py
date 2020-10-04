@@ -7,6 +7,8 @@ import cv2
 from tf_pose_estimation.tf_pose.estimator import TfPoseEstimator
 from tf_pose_estimation.tf_pose.networks import get_graph_path, model_wh
 
+from src.poseapp.posegeom import PoseGeom
+from src.util.framesocketstream import FrameSocketStream
 import time
 import tensorflow as tf
 
