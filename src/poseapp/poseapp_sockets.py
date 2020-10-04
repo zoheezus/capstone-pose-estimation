@@ -109,6 +109,37 @@ class PoseAppWSockets():
         self.received_fps = time.time()
         self.frame_processed_queue.put(frame)
 
-# functions below will use PoseGeom & FrameSocketStream
-# Will need to be created before further progress
-# in this file
+    @staticmethod
+    def indentify_body_gestures(frame, human):
+        joint_list = human.body_parts
+        pose = "none"
+        fontsize = 0.5
+
+        try:
+            image_h, image_w = frame.shape[:2]
+
+            # calculate angle between left shoulder and left elbow
+            if joint_list.keys() >= {PoseGeom.LEFT_SHOULDER, PoseGeom.LEFT_ELBOW}:
+                angle_2_3 = PoseGeom.angle_btw_2_points(joint_list[PoseGeom.LEFT_SHOULDER],
+                                                        joint_list[PoseGeom.LEFT_ELBOW])
+
+                cv2.putText(frame, "angle: %0.2f" % angle_2_3,
+                            PoseAppWSockets.translate_to_actual_dims(image_w, image_h,
+                                                                     joint_list[PoseGeom.LEFT_SHOULDER].x - 0.27,
+                                                                     joint_list[PoseGeom.LEFT_SHOULDER].y),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
+
+            # calculate angle between left elbow and left hand
+            if joint_list.keys() >= {PoseGeom.LEFT_ELBOW, PoseGeom.LEFT_HAND}:
+                angle_3_4 = PoseGeom.angle_btw_2_points(joint_list[PoseGeom.LEFT_ELBOW],
+                                                        joint_list[PoseGeom.LEFT_HAND])
+
+                cv2.putText(frame, "angle: %0.2f" % angle_3_4,
+                            PoseAppWSockets.translate_to_actual_dims(image_w, image_h,
+                                                                     joint_list[PoseGeom.LEFT_ELBOW].x - 0.27,
+                                                                     joint_list[PoseGeom.LEFT_ELBOW].y),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
+        except Exception as e:
+            logger.error(traceback.format_exc())
+
+        return frame, pose
