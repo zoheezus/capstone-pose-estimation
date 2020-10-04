@@ -127,3 +127,15 @@ class FrameSocketStream():
 
         except socket.timeout:
             logger.info("Socket timeout while sending. Continuing...")
+
+    def close_socket(self):
+        logger.info("Sending message for server to close...")
+        self.send_message(b'close')
+
+        try:
+            if not self.th_recv_signal.is_set():
+                self.th_recv_signal.set()
+
+        except RuntimeError as e:
+            logger.error(
+                "Error joining thread. Continue attempt to close socket")
