@@ -139,6 +139,28 @@ class PoseAppWSockets():
                                                                      joint_list[PoseGeom.LEFT_ELBOW].x - 0.27,
                                                                      joint_list[PoseGeom.LEFT_ELBOW].y),
                             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
+
+            # calculate angle between right shoulder and right elbow
+            if joint_list.keys() >= {PoseGeom.RIGHT_SHOULDER, PoseGeom.RIGHT_ELBOW}:
+                angle_5_6 = PoseGeom.angle_btw_2_points(joint_list[PoseGeom.RIGHT_SHOULDER],
+                                                        joint_list[PoseGeom.RIGHT_ELBOW])
+
+                cv2.putText(frame, "angle: %0.2f" % angle_5_6,
+                            PoseAppWSockets.translate_to_actual_dims(image_w, image_h,
+                                                                     joint_list[PoseGeom.RIGHT_SHOULDER].x,
+                                                                     joint_list[PoseGeom.RIGHT_SHOULDER].y),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
+
+            # calculate angle between right elbow and right hand
+            if joint_list.keys() >= {PoseGeom.RIGHT_ELBOW, PoseGeom.RIGHT_HAND}:
+                angle_6_7 = PoseGeom.angle_btw_2_points(joint_list[PoseGeom.RIGHT_ELBOW],
+                                                        joint_list[PoseGeom.LEFT_HAND])
+
+                cv2.putText(frame, "angle: %0.2f" % angle_6_7,
+                            PoseAppWSockets.translate_to_actual_dims(image_w, image_h,
+                                                                     joint_list[PoseGeom.RIGHT_ELBOW].x,
+                                                                     joint_list[PoseGeom.RIGHT_ELBOW].y),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
         except Exception as e:
             logger.error(traceback.format_exc())
 
