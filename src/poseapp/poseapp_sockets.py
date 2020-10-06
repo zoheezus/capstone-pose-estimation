@@ -161,6 +161,17 @@ class PoseAppWSockets():
                                                                      joint_list[PoseGeom.RIGHT_ELBOW].x,
                                                                      joint_list[PoseGeom.RIGHT_ELBOW].y),
                             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
+
+            # calculate distance between 2 hands
+            if joint_list.keys() >= {PoseGeom.LEFT_HAND, PoseGeom.RIGHT_HAND}:
+                distance_4_7 = PoseGeom.distance_btw_2_points(joint_list[PoseGeom.LEFT_HAND],
+                                                              joint_list[PoseGeom.RIGHT_HAND])
+
+                cv2.putText(frame, "distance: %0.2f" % distance_4_7,
+                            PoseAppWSockets.translate_to_actual_dims(image_w, image_h,
+                                                                     joint_list[PoseGeom.RIGHT_HAND].x,
+                                                                     joint_list[PoseGeom.RIGHT_HAND].y),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
         except Exception as e:
             logger.error(traceback.format_exc())
 
