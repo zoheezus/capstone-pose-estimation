@@ -16,16 +16,13 @@ logger = logging.getLogger(__name__)
 
 poseapp = PoseAppWSockets(delay_time=160)
 
-@app.route
-
 @app.route('/')
 def index():
-    # index.html needs to be created
     # JSX if time permits
     return Response(render_template("index.html"))
 
 @app.route('/start', methods=['POST'])
 def start():
     # start processings
-    # delete pass when writing code
-    pass
+    global poseapp
+    global processing_started
