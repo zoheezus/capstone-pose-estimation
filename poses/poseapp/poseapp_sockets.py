@@ -183,7 +183,7 @@ class PoseAppWSockets():
         # grab the image size
         dim = None
         (h, w) = image.shape[:2]
-        
+
         if width is None and height is None:
             # return original image
             return image
