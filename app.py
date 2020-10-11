@@ -7,7 +7,7 @@ import cv2
 from flask import Flask, render_template, Response, request
 from flask_socketio import SocketIO, send, emit
 
-from src.poseapp.poseapp_sockets import PoseAppWSockets
+from poses.poseapp.poseapp_sockets import PoseAppWSockets
 
 app = Flask(__name__, template_folder="static")
 socketio = SocketIO(app)
