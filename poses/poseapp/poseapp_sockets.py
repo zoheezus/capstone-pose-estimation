@@ -177,3 +177,33 @@ class PoseAppWSockets():
             logger.error(traceback.format_exc())
 
         return frame, pose
+
+    def resize_image_aspect_ratio(self, image, width=None, height=None, inter=cv2.INTER_AREA):
+        # initialize the dimensions of the image to be resized and
+        # grab the image size
+        dim = None
+        (h, w) = image.shape[:2]
+        
+        if width is None and height is None:
+            # return original image
+            return image
+
+        # check to see if width is None
+        if width is None:
+            # calculate the ratio of the height and
+            # construct the dimensions
+            r = height / float(h)
+            dim = (int(w*r), height)
+
+        # otherwise, height is None
+        else:
+            # calculate the ratio of the width and
+            # construct the dimensions
+            r = width / float(w)
+            dim = (width, int(h*r))
+
+        # resize image
+        resized = cv2.resize(image, dim, interpolation=inter)
+
+        # return resized image
+        return resized
