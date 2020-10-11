@@ -16,13 +16,27 @@ logger = logging.getLogger(__name__)
 
 poseapp = PoseAppWSockets(delay_time=160)
 
+
 @app.route('/')
 def index():
     # JSX if time permits
     return Response(render_template("index.html"))
+
 
 @app.route('/start', methods=['POST'])
 def start():
     # start processings
     global poseapp
     global processing_started
+
+    if not processing_started:
+        try:
+            server_add = request.form["server_add"]
+            poseapp.start(remote_server_ip=server_add)
+            processing_started = True
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            return Response("internal server error: try again", status=500)
+        return "started processing"
+    else:
+        return "already started"
