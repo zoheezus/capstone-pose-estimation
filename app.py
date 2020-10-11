@@ -40,3 +40,15 @@ def start():
         return "started processing"
     else:
         return "already started"
+
+@app.route('/stop', methods=['POST'])
+def stop():
+    global processing_started
+    try:
+        processing_started = False
+        poseapp.stop()
+    except Exception as e:
+        logging.error(traceback.format_exc())
+        return Response("unable to stop. error occurred.", status=500)
+    return "stopped"
+    
