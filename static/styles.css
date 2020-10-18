@@ -1,0 +1,26 @@
+.app {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.top {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.left {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-content: flex-end;
+}
+
+.right {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+}
