@@ -53,3 +53,18 @@ PORT = 8089
 conn = None
 addr = None
 connected = False
+
+
+def wait_for_connection():
+    global s, connected, conn, addr
+    try:
+        logger.info("Listening for connections...")
+        s.listen(5)
+        conn, addr = s.accept()
+        conn.settimeout(30)
+        logger.info("Connected to {}\nStart video processing.".format(addr))
+        connected = True
+    except Exception as e:
+        logger.error(traceback.format_exc())
+        logger.info("Restarting...")
+        wait_for_connection()
