@@ -68,3 +68,18 @@ def wait_for_connection():
         logger.error(traceback.format_exc())
         logger.info("Restarting...")
         wait_for_connection()
+
+
+def _worker_th(frame):
+    global estimator, w, h
+    humans = estimator.inference(frame, resize_to_default=(
+        w > 0 and h > 0), upsample_size=4.0)
+    pose = "none"
+    if len(humans) > 0:
+        humans.sort(key=lambda x: x.score, reverse=True)
+        # get the human with the highest score
+        humans = humans[:1]
+        frame = TfPoseEstimator.draw_humans(frame, humans)
+        frame, pose = PoseAppWSockets.indentify_body_gestures(frame, humans[0])
+
+    return frame, pose
