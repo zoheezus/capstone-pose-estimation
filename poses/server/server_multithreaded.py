@@ -83,3 +83,38 @@ def _worker_th(frame):
         frame, pose = PoseAppWSockets.indentify_body_gestures(frame, humans[0])
 
     return frame, pose
+
+
+def _send_th():
+    logger.info("Sending thread started...")
+    global conn, exc_info, exc_thrown
+    global futures_q
+    global th_signal
+    fps_time = time.time()
+    while True and not th_signal.is_set():
+        try:
+            future = futures_q.get(timeout=2)
+            frame, pose = future.result(timeout=2)
+            humans_data = pickle.dumps((frame, pose))
+            conn.sendall(struct.pack("<L", len(humans_data)) + humans_data)
+
+            fps_time = time.time()
+
+        except concurrent.futures.TimeoutError:
+            logger.info("Waiting for worker thread to complete frame to send.")
+            continue
+
+        except ZeroDivisionError:
+            logger.error("FPS division error")
+            continue
+
+        except Empty:
+            logger.warning("Future queue is empty.")
+            continue
+
+        except Exception as ex:
+            logger.info("Exception caught in send thread, raising to main thread... \n{}".format(
+                traceback.format_exc()))
+            exc_info = sys.exc_info()
+            exc_thrown = True
+            continue
