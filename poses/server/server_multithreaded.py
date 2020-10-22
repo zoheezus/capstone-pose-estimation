@@ -118,3 +118,33 @@ def _send_th():
             exc_info = sys.exc_info()
             exc_thrown = True
             continue
+
+
+def exit_connection():
+    global conn
+    global send_th
+    global futures_q, worker_mgr
+    global connected, exc_info
+
+    # close process threads
+    if not th_signal.is_set():
+        conn.sendall(struct.pack("<L", len(b'close')) + b'close')
+        th_signal.set()
+        send_th.join()
+        logger.info("Sending thread closed.")
+
+    try:
+        conn.close()
+        logger.info("Closing socket...")
+    except:
+        logger.error("Error closing socket {}".format(traceback.format_exc()))
+
+    # wait and clear all pending futures
+    logger.info("Shutting down thread pool executor...")
+    worker_mgr.shutdown(wait=False)
+
+    logger.info("Clearing futures queue...")
+    with futures_q.mutex:
+        futures_q.queue.clear()
+
+    connected = False
