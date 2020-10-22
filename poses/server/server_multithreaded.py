@@ -148,3 +148,14 @@ def exit_connection():
         futures_q.queue.clear()
 
     connected = False
+
+
+def start_threads():
+    global worker_mgr, n_workers, send_th, th_signal, exc_info, exc_thrown
+    exc_info = None
+    exc_thrown = False
+    th_signal.clear()
+    logger.info("Initialising thread pool with {} workers".format(n_workers))
+    worker_mgr = futures.ThreadPoolExecutor(max_workers=n_workers)
+    send_th = threading.Thread(target=_send_th)
+    send_th.start()
