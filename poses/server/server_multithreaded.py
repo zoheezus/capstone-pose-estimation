@@ -159,3 +159,65 @@ def start_threads():
     worker_mgr = futures.ThreadPoolExecutor(max_workers=n_workers)
     send_th = threading.Thread(target=_send_th)
     send_th.start()
+
+
+if __name__ == "__main__":
+    s.bind((HOST, PORT))
+    logger.info(
+        "Socket successfully creatd and binded to {0}:{1}".format(HOST, PORT))
+
+    fps_time = time.time()
+    payload_size = struct.calcsize("<L")
+
+    while True:
+        if not connected:
+            wait_for_connection()
+            start_threads()
+            data = b""
+        else:
+            try:
+                if exc_thrown:
+                    logger.error(
+                        "Exception caught in send thread, breaking the connection...")
+                    raise exc_info[1].with_traceback(exc_info[2])
+
+                while len(data) < payload_size:
+                    data += conn.recv(8195)
+                    if not data:
+                        raise RuntimeError(
+                            "no data received, closing connection, listening for new connection")
+                packed_msg_size = data[:payload_size]
+                # number of bytes in frame
+                msg_size = struct.unpack("<L", packed_msg_size)[0]
+
+                # Get the frame data itself into data var
+                data = data[payload_size:]
+
+                while len(data) < msg_size:
+                    data += conn.recv(8196)
+                    if not data:
+                        raise RuntimeError(
+                            "no data received, closing connection, listening for new connection")
+
+                msg_data = data[:msg_size]
+                data = data[msg_size:]
+
+                fps_time = time.time()
+
+                # check if message is for frame or to close
+                if msg_data == b'close':
+                    logger.info("received closed signal from client.")
+                    exit_connection()
+                    continue
+
+                # convert the frame data back to its original form
+                frame = pickle.loads(msg_data)
+
+                # submit frame to worker thread for processing
+                future = worker_mgr.submit(_worker_th, frame)
+                futures_q.put(future)
+            except Exception as e:
+                logger.error("Exception caught! {}".format(
+                    traceback.format_exc()))
+                exit_connection()
+                continue
