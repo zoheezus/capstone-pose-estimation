@@ -79,10 +79,13 @@ thread = None
 thread_lock = threading.Lock()
 
 # def scheduled task to emit
+
+
 def background_thread():
     while True:
         socketio.sleep(3)
         socketio.emit('testing...')
+
 
 @socketio.on('connect')
 def test_connect():
