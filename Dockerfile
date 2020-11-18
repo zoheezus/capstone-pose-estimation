@@ -80,7 +80,7 @@ RUN cd tf_pose_estimation && python setup.py install && cd ..
 # RUN rm -rf tf_pose
 
 #CMD ["./start_producer"]
-CMD ["python3", "-m", "./poses/server/server_multithreaded"]
+CMD ["python3", "./poses/server/server_multithreaded.py"]
 # default entry point is /bin/sh
 #CMD ["python", "-m", "src.server.server_multithreaded"]
 #`awskcl_helper.py --print_command \
