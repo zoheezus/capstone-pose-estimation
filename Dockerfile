@@ -18,9 +18,6 @@ RUN pip3 install --upgrade pip
 
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
-# RUN pip3 install --upgrade setuptools
-# RUN pip3 install setuptools==44.0.0
-
 RUN pip3 install numpy==1.16.0
 
 RUN cd ~/ &&\
@@ -32,58 +29,19 @@ RUN cd ~/ &&\
 # Set the appropriate link
 RUN ln /dev/null /dev/raw1394
 
-# --------------------------
-# install java for the amazon-kcl
-# --------------------------
-# ENV JAVA_HOME       /usr/lib/jvm/java-8-oracle
-# ENV LANG            en_US.UTF-8
-# ENV LC_ALL          en_US.UTF-8
-
-# github fix https://github.com/pytorch/text/issues/77#issuecomment-319206865
-# RUN apt-get update --fix-missing && apt-get locales
-# RUN locale-gen en_US.UTF-8
-# ENV LANG en_US.UTF-8
-# ENV LC_ALL en_US.UTF-8
-
 RUN apt-get update && apt-get install -y locales
 RUN locale-gen en_US.UTF-8
 
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
-# RUN apt-get update && \
-#   apt-get install -y --no-install-recommends locales && \
-#   locale-gen en_US.UTF-8 && \
-#   apt-get dist-upgrade -y && \
-#   apt-get --purge remove openjdk* && \
-#   echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections && \
-#   echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list && \
-#   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
-#   apt-get update && \
-#   apt-get install -y --no-install-recommends oracle-java8-installer oracle-java8-set-default && \
-#   apt-get install -y dos2unix && \
-#   apt-get clean all
-
 COPY requirements.txt /usr/pose_recognizer/requirements.txt
 WORKDIR /usr/pose_recognizer
 RUN pip3 install -r requirements.txt
 COPY tf-openpose ./tf-openpose
 COPY . /usr/pose_recognizer
-# RUN apt-get install -y dos2unix
-# RUN dos2unix ./start_producer.sh && chmod +x ./start_producer.sh
-# RUN apt-get update && apt-get install -y python-setuptools
-# RUN pip3 install --ignore-installed --upgrade setuptools wheel
 
-# if below line doesnt work, try inserting it below pip upgrade
-# RUN pip3 install -U setuptools==44.0.0
 RUN cd tf_pose_estimation && python setup.py install && cd ..
-# RUN rm -rf tf_pose
 
-#CMD ["./start_producer"]
 CMD ["python3", "./poses/server/server_multithreaded.py"]
-# default entry point is /bin/sh
-#CMD ["python", "-m", "src.server.server_multithreaded"]
-#`awskcl_helper.py --print_command \
-#    --java <path-to-java> --properties samples/sample.properties`
-#
-#CMD ['python'awskcl_helper.py']
+
