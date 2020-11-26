@@ -35,13 +35,15 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
-# COPY requirements.txt /usr/pose_recognizer/requirements.txt
-# WORKDIR /usr/pose_recognizer
+COPY requirements.txt /usr/pose_recognizer/requirements.txt
+# COPY requirements.txt ./requirements.txt
+WORKDIR /usr/pose_recognizer
 RUN pip3 install -r requirements.txt
 # COPY tf-openpose ./tf-openpose
-# COPY . /usr/pose_recognizer
-
-RUN cd tf_pose_estimation && python setup.py install && cd ..
+COPY tf_pose_estimation ./tf_pose_estimation
+COPY . /usr/pose_recognizer
+RUN cd tf_pose_estimation && python3 setup.py install && cd ..
+# RUN rm -rf tf_pose_estimation
 
 CMD ["python3", "./poses/server/server_multithreaded.py"]
 
