@@ -10,6 +10,8 @@ import time
 
 from poses.poseapp.poseapp_sockets import PoseAppWSockets
 
+# app will run without aws and docker-machine.
+# instead, app will run locally
 app = Flask(__name__, template_folder="static")
 socketio = SocketIO(app)
 processing_started = False
