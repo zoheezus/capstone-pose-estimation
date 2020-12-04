@@ -44,6 +44,6 @@ COPY tf_pose_estimation ./tf_pose_estimation
 COPY . /usr/pose_recognizer
 RUN cd tf_pose_estimation && python3 setup.py install && cd ..
 # RUN rm -rf tf_pose_estimation
-
+ENV PYTHONPATH=.
 CMD ["python3", "./poses/server/server_multithreaded.py"]
 
