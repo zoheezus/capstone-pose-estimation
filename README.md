@@ -15,7 +15,7 @@ exit
 ```
 
 ## Docker
-```docker
+```powershell
 docker build -t zoheezus/capstone .
 docker push zoheezus/capstone
 docker run -p 8089:8089 zoheezus/capstone
