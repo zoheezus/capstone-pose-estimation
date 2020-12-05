@@ -42,12 +42,7 @@ RUN pip3 install -r requirements.txt
 # COPY tf-openpose ./tf-openpose
 COPY tf_pose_estimation ./tf_pose_estimation
 COPY . /usr/pose_recognizer
-# RUN cd tf_pose_estimation && python3 setup.py install && cd ..
-RUN cd tf_pose_estimation/tf_pose/pafprocess &&\
- apt-get swig &&\
- swig -python -c++ pafprocess.i &&\
- python3 setup.py build_ext --inplace &&\
- cd .. && cd .. && cd ..
+RUN cd tf_pose_estimation && python3 setup.py install && cd ..
 # RUN rm -rf tf_pose_estimation
 ENV PYTHONPATH=.
 CMD ["python3", "./poses/server/server_multithreaded.py"]
