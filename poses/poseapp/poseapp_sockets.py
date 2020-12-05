@@ -20,11 +20,10 @@ logger.setLevel(logging.INFO)
 class PoseAppWSockets():
 
     def __init__(self, camera=0, resize='0x0', resize_out_ratio=4.0, model="mobilenet_thin", show_process=False,
-                 remote_server='', delay_time=500):
+                 delay_time=500):
 
         self.last_epoch = time.time()
         self.delay_time = delay_time
-        self.remote_server = remote_server
         self.show_process = show_process
         self.model = model
         self.resize = resize
@@ -41,19 +40,85 @@ class PoseAppWSockets():
 
         self.res_w = 436
 
-    def start(self, remote_server_ip):
+    # def start(self):
+    #     """
+    #     Start the sending thread to frames to server.
+    #     Sockets will be handled by FrameSocketStream.
+    #     :param remote_server_id:
+    #     :return:
+    #     """
+    #     self.start_th_signal = threading.Event()
+    #     self.start_th = threading.Thread(target=self._th_start)
+
+    #     self.start_th.start()
+    def start(self):
         """
-        Start the sending thread to frames to server.
-        Sockets will be handled by FrameSocketStream.
-        :param remote_server_id:
+        Start socket connection and stream footage to aws server.
+        Socket is only exposed in this function
         :return:
         """
-        self.start_th_signal = threading.Event()
-        self.start_th = threading.Thread(target=self._th_start)
-        if remote_server_ip is not None:
-            self.remote_server = remote_server_ip
+        logger.debug('cam read+')
+        cam = cv2.VideoCapture(self.camera)
+        ret_val, frame = cam.read()
+        logger.debug('initialization %s : %s' %
+                     (self.model, get_graph_path(self.model)))
+        logger.info('cam image=%dx%d' % (frame.shape[1], frame.shape[0]))
+        w, h = model_wh(self.resize)
 
-        self.start_th.start()
+        if w > 0 and h > 0:
+            e = TfPoseEstimator(get_graph_path(self.model), target_size=(w, h),
+                                tf_config=tf.ConfigProto(log_device_placement=True))
+        else:
+            e = TfPoseEstimator(get_graph_path(self.model), target_size=(432, 368),
+                                tf_config=tf.ConfigProto(log_device_placement=True))
+
+        # t = threading.currentThread()
+        while True and not self.start_th_signal.wait(self.delay_time / 1000):
+            ##############################################
+            ### START CAMERA STREAM AND DRAW SKELETONS ###
+            ##############################################
+            ret_val, frame = cam.read()
+            frame = cv2.flip(frame, 1)
+            frame = self.resize_image_aspect_ratio(frame, width=self.res_w)
+
+            logger.debug('image process+')
+            humans = e.inference(frame, resize_to_default=(
+                w > 0 and h > 0), upsample_size=self.resize_out_ratio)
+            pose = ''
+
+            logger.debug('postprocess+')
+            frame = TfPoseEstimator.draw_humans(
+                frame, humans, imgcopy=False)
+
+            if len(humans) > 0:
+                humans.sort(key=lambda x: x.score, reverse=True)
+                # get human with highest score
+                humans = humans[:1]
+                frame = TfPoseEstimator.draw_humans(frame, humans)
+                frame, pose = self.identify_body_gestures(frame, humans[0])
+
+            cv2.putText(frame,
+                        "FPS: %f" % (1.0 / (time.time() - self.fps_time)),
+                        (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                        (0, 255, 0), 2)
+
+            self.fps_time = time.time()
+            cv2.waitKey(self.delay_time)
+            cv2.imshow('tf-pose-estimation result', frame)
+
+            if cv2.waitKey(1) == 27:
+                break
+
+            logger.debug('finished+')
+
+            # sends 3 frames every self.delay_time
+            logger.info("fps send %s" % (1.0 / (time.time() - self.sent_fps)))
+            self.sent_fps = time.time()
+            cv2.waitKey(self.delay_time)
+
+        cam.release()
+        cv2.destroyAllWindows()
+        logger.info("Camera released")
 
     def stop(self):
         try:
@@ -207,100 +272,3 @@ class PoseAppWSockets():
 
         # return resized image
         return resized
-
-    def _th_start(self):
-        """
-        Start socket connection and stream footage to aws server.
-        Socket is only exposed in this function
-        :return:
-        """
-        logger.debug('cam read+')
-        cam = cv2.VideoCapture(self.camera)
-        ret_val, frame = cam.read()
-        logger.debug('initialization %s : %s' %
-                     (self.model, get_graph_path(self.model)))
-        logger.info('cam image=%dx%d' % (frame.shape[1], frame.shape[0]))
-        w, h = model_wh(self.resize)
-
-        if self.remote_server != '':
-            try:
-                serverip = self.remote_server.split(":")[0]
-                port = self.remote_server.split(":")[1]
-                socket = FrameSocketStream(serverip, port)
-                socket.init_connection()
-
-                # start the receiving thread with the callback function
-                # to process the result
-                socket.start_recv_thread(recv_callback=self.draw_frame)
-            except RuntimeError:
-                logger.error("Problem connecting to server. Try again")
-                return
-        else:
-            if w > 0 and h > 0:
-                e = TfPoseEstimator(get_graph_path(self.model), target_size=(w, h),
-                                    tf_config=tf.ConfigProto(log_device_placement=True))
-            else:
-                e = TfPoseEstimator(get_graph_path(self.model), target_size=(432, 368),
-                                    tf_config=tf.ConfigProto(log_device_placement=True))
-
-        t = threading.currentThread()
-        test_count = 0
-        while True and not self.start_th_signal.wait(self.delay_time / 1000):
-            ##############################################
-            ### START CAMERA STREAM AND DRAW SKELETONS ###
-            ##############################################
-            ret_val, frame = cam.read()
-            frame = cv2.flip(frame, 1)
-            frame = self.resize_image_aspect_ratio(frame, width=self.res_w)
-
-            if self.remote_server != '':
-                if test_count > 5:
-                    socket.send(frame)
-                else:
-                    socket.send(frame)
-                    time.sleep(0.5)
-                    test_count += 1
-            else:
-                logger.debug('image process+')
-                humans = e.inference(frame, resize_to_default=(
-                    w > 0 and h > 0), upsample_size=self.resize_out_ratio)
-                pose = ''
-
-                logger.debug('postprocess+')
-                frame = TfPoseEstimator.draw_humans(
-                    frame, humans, imgcopy=False)
-
-                if len(humans) > 0:
-                    humans.sort(key=lambda x: x.score, reverse=True)
-                    # get human with highest score
-                    humans = humans[:1]
-                    frame = TfPoseEstimator.draw_humans(frame, humans)
-                    frame, pose = self.identify_body_gestures(frame, humans[0])
-
-                cv2.putText(frame,
-                            "FPS: %f" % (1.0 / (time.time() - self.fps_time)),
-                            (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                            (0, 255, 0), 2)
-
-                self.fps_time = time.time()
-                cv2.waitKey(self.delay_time)
-                cv2.imshow('tf-pose-estimation result', frame)
-
-                if cv2.waitKey(1) == 27:
-                    break
-
-                logger.debug('finished+')
-
-            # sends 3 frames every self.delay_time
-            logger.info("fps send %s" % (1.0 / (time.time() - self.sent_fps)))
-            self.sent_fps = time.time()
-            cv2.waitKey(self.delay_time)
-
-        if self.remote_server != '':
-            logger.info("Cleaning up socket...")
-            socket.close_socket()
-            del socket
-
-        cam.release()
-        cv2.destroyAllWindows()
-        logger.info("Camera released")

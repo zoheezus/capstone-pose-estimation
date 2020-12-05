@@ -35,7 +35,7 @@ def start():
     if not processing_started:
         try:
             server_add = request.form["server_add"]
-            poseapp.start(remote_server_ip=server_add)
+            poseapp.start()
             processing_started = True
         except Exception as e:
             logger.error(traceback.format_exc())
