@@ -75,24 +75,3 @@ def camera_feed():
         logger.info('Videostream closed')
 
     return Response(gen_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-thread = None
-thread_lock = threading.Lock()
-
-# def scheduled task to emit
-
-
-def background_thread():
-    while True:
-        socketio.sleep(3)
-        socketio.emit('testing...')
-
-
-@socketio.on('connect')
-def test_connect():
-    logger.info('Websockets connected...Sending info')
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(target=background_thread)
