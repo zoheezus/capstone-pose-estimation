@@ -34,7 +34,6 @@ def start():
 
     if not processing_started:
         try:
-            server_add = request.form["server_add"]
             poseapp.start()
             processing_started = True
         except Exception as e:
