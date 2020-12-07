@@ -37,17 +37,6 @@ class PoseAppWSockets():
 
         self.res_w = 436
 
-    # def start(self):
-    #     """
-    #     Start the sending thread to frames to server.
-    #     Sockets will be handled by FrameSocketStream.
-    #     :param remote_server_id:
-    #     :return:
-    #     """
-    #     self.start_th_signal = threading.Event()
-    #     self.start_th = threading.Thread(target=self._th_start)
-
-    #     self.start_th.start()
     def start(self):
         """
         Start socket connection and stream footage to aws server.
@@ -69,8 +58,6 @@ class PoseAppWSockets():
             e = TfPoseEstimator(get_graph_path(self.model), target_size=(432, 368),
                                 tf_config=tf.ConfigProto(log_device_placement=True))
 
-        # t = threading.currentThread()
-        # while True and not self.start_th_signal.wait(self.delay_time / 1000):
         while True:
             ##############################################
             ### START CAMERA STREAM AND DRAW SKELETONS ###

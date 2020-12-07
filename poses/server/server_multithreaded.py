@@ -19,7 +19,7 @@ w, h = model_wh("432x368")
 def _worker_th(frame):
     global estimator, w, h
     humans = estimator.inference(frame, resize_to_default=(
-        w > 0 and h > 0), upsample_size=4.0)
+    w > 0 and h > 0), upsample_size=4.0)
     pose = "none"
     if len(humans) > 0:
         humans.sort(key=lambda x: x.score, reverse=True)

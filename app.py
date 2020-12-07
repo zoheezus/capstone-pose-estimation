@@ -1,11 +1,9 @@
 import logging
-import threading
 import traceback
 from queue import Empty
 
 import cv2
 from flask import Flask, render_template, Response, request
-from flask_socketio import SocketIO, send, emit
 import time
 
 from poses.poseapp.poseapp_sockets import PoseAppWSockets
@@ -13,7 +11,6 @@ from poses.poseapp.poseapp_sockets import PoseAppWSockets
 # app will run without aws and docker-machine.
 # instead, app will run locally
 app = Flask(__name__, template_folder="static")
-socketio = SocketIO(app)
 processing_started = False
 logger = logging.getLogger(__name__)
 
