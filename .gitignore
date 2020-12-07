@@ -27,6 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 tf_pose_estimation/
+tf-openpose/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
