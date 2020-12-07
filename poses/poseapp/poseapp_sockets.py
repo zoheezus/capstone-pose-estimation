@@ -79,7 +79,7 @@ class PoseAppWSockets():
                 # get human with highest score
                 humans = humans[:1]
                 frame = TfPoseEstimator.draw_humans(frame, humans)
-                frame, pose = self.identify_body_gestures(frame, humans[0])
+                frame, pose = PoseAppWSockets.identify_body_gestures(frame, humans[0])
 
             cv2.putText(frame,
                         "FPS: %f" % (1.0 / (time.time() - self.fps_time)),
