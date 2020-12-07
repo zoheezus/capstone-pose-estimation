@@ -45,27 +45,7 @@
     <br>
     <div id="process_container">
     </div>
-    <div class="text-center"><input id="res_input" type="text"
-                                    data-provide="slider"
-                                    data-slider-ticks="[28,232, 436, 640]"
-                                    data-slider-ticks-labels='["28","232", "436", "640"]'
-                                    data-slider-min="28"
-                                    data-slider-max="640"
-                                    data-slider-step="204"
-                                    data-slider-value="436"
-                                    data-slider-tooltip="hide"/></div>
     <section id="process_start_form" class="form-simple text-center">
-        <label for="server_add" class="grey-text">Server Address 1</label>
-        <div id="server1" data-bind="with:server" class="form-inline mr-auto justify-content-center">
-            <select required id="server_add">
-                <option value="" disabled selected>Choose your server</option>
-                <option value="1">ip_address_1</option>
-                <option value="2">ip_address_2</option>
-            </select>
-            <span data-bind="text:status, css:color"></span>
-        </div>
-        <br>
-
         <br>
         <div class="text-center mt-4">
             <button id="start" class="btn btn-dark-green" type="submit">Start Process</button>
@@ -74,6 +54,9 @@
         </div>
 
     </section>
+    <div id="camera_feed">
+        
+    </div>
     <div id="events">
         events
     </div>
@@ -84,7 +67,6 @@
         {% endfor %}
 
     </div>
-
 </div>
 
 </body>

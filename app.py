@@ -60,7 +60,8 @@ def stop():
 def camera_feed():
     def gen_feed():
         fps_time = time.time()
-        while True and not poseapp.start_th_signal.is_set():
+        # while True and not poseapp.start_th_signal.is_set():
+        while True:
             try:
                 frame = poseapp.frame_processed_queue.get(
                     block=True, timeout=2)

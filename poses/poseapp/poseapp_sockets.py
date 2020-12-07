@@ -30,10 +30,7 @@ class PoseAppWSockets():
         self.resize_out_ratio = resize_out_ratio
         self.camera = camera
 
-        self._frame_sent_queue = Queue()
         self.frame_processed_queue = Queue()
-        self.socket = None
-        self.start_th = None
         self.sent_fps = time.time()
         self.received_fps = time.time()
         self.fps_time = time.time()
@@ -73,7 +70,8 @@ class PoseAppWSockets():
                                 tf_config=tf.ConfigProto(log_device_placement=True))
 
         # t = threading.currentThread()
-        while True and not self.start_th_signal.wait(self.delay_time / 1000):
+        # while True and not self.start_th_signal.wait(self.delay_time / 1000):
+        while True:
             ##############################################
             ### START CAMERA STREAM AND DRAW SKELETONS ###
             ##############################################
@@ -124,7 +122,6 @@ class PoseAppWSockets():
         try:
             if not self.start_th_signal.is_set():
                 self.start_th_signal.set()
-                self.start_th.join()
 
             # clear the queues
             with self.frame_processed_queue.mutex:
