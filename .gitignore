@@ -1,4 +1,5 @@
-# tf-openpose/
+tf_pose_estimation/
+tf-openpose/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -26,8 +27,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-tf_pose_estimation/
-tf-openpose/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
