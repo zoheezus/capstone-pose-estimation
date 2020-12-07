@@ -72,3 +72,4 @@ def camera_feed():
         logger.info('Videostream closed')
 
     return Response(gen_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
