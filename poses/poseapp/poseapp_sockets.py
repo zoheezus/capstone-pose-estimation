@@ -159,7 +159,7 @@ class PoseAppWSockets():
         self.frame_processed_queue.put(frame)
 
     @staticmethod
-    def indentify_body_gestures(frame, human):
+    def identify_body_gestures(frame, human):
         joint_list = human.body_parts
         pose = "none"
         fontsize = 0.5
