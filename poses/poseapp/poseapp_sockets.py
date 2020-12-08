@@ -221,6 +221,19 @@ class PoseAppWSockets():
                                                                      joint_list[PoseGeom.RIGHT_HAND].x,
                                                                      joint_list[PoseGeom.RIGHT_HAND].y),
                             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 2)
+                            
+                if PoseGeom.left(joint_list):
+                    pose = "left hand out"
+                elif PoseGeom.right(joint_list):
+                    pose = "right hand out"
+                elif PoseGeom.both_hands_up(joint_list):
+                    pose = "both hands up"
+                else:
+                    pose = "stand by"
+
+                cv2.putText(frame, "pose: {0}".format(pose),
+                            (5, int(round((image_h - 20)))), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+
         except Exception as e:
             logger.error(traceback.format_exc())
 
